@@ -11,12 +11,10 @@ export default function App() {
   const [error, setError] = useState('');
   const [token, setToken] = useState('');
   
-  // Clean, empty login state
   const [emailOrUser, setEmailOrUser] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
 
-  // Fetch tasks from API on mount
   const fetchTasks = async () => {
     setLoading(true);
     setError('');
@@ -38,7 +36,6 @@ export default function App() {
     fetchTasks();
   }, []);
 
-  // Handle Login - sends both email and username keys for maximum backend compatibility
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoginError('');
@@ -66,14 +63,12 @@ export default function App() {
     }
   };
 
-  // Handle Create Task POST /api/tasks
   const handleAddTask = async (taskData) => {
     if (!token) {
       alert('You must be logged in to create a task!');
       return;
     }
 
-    // Format payload properly as an object, whether taskData is a string title or an object
     const payload = typeof taskData === 'string' ? { title: taskData } : taskData;
 
     try {
@@ -101,7 +96,6 @@ export default function App() {
     <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
       <h1>Task Manager</h1>
 
-      {/* Login Section */}
       {!token ? (
         <form onSubmit={handleLogin} style={{ marginBottom: '20px', border: '1px solid #ccc', padding: '15px', borderRadius: '5px' }}>
           <h3>Login</h3>
@@ -109,7 +103,7 @@ export default function App() {
           <div style={{ marginBottom: '10px' }}>
             <input
               type="text"
-              placeholder="Username"
+              placeholder="Username or Email"
               value={emailOrUser}
               onChange={(e) => setEmailOrUser(e.target.value)}
               required
@@ -135,12 +129,10 @@ export default function App() {
         </div>
       )}
 
-      {/* Task Creation Form */}
       {token && <TaskForm onAddTask={handleAddTask} />}
 
       <hr />
 
-      {/* Task List / Loading / Error Handling */}
       {loading && <p>Loading tasks from server...</p>}
 
       {error && !loading && (
