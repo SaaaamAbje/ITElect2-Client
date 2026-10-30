@@ -1,5 +1,4 @@
 export default function TaskList({ tasks }) {
-  // Helper function to format date to YYYY-MM-DD
   const formatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -7,33 +6,24 @@ export default function TaskList({ tasks }) {
   };
 
   return (
-    <ul style={{ listStyle: 'none', padding: 0 }}>
+    <ul style={{ listStyle: 'none', padding: 0, margin: '20px 0' }}>
       {tasks.map((task) => (
         <li
           key={task.id}
           style={{
-            padding: '12px',
-            borderBottom: '1px solid #ddd',
+            padding: '12px 0',
+            borderBottom: '1px solid #eee',
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'center'
+            alignItems: 'center',
+            width: '100%'
           }}
         >
-          <span
-            style={{
-              fontSize: '1rem',
-              textDecoration: task.completed ? 'line-through' : 'none'
-            }}
-          >
+          <span style={{ textAlign: 'left', fontSize: '1rem', color: '#333' }}>
             {task.title}
           </span>
 
-          <span
-            style={{
-              fontSize: '0.9rem',
-              color: '#666'
-            }}
-          >
+          <span style={{ textAlign: 'right', fontSize: '0.9rem', color: '#666', marginLeft: '16px' }}>
             {formatDate(task.dueDate || task.createdAt)}
           </span>
         </li>
