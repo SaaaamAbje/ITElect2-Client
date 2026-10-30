@@ -1,4 +1,11 @@
 export default function TaskList({ tasks }) {
+  // Helper function to format date to YYYY-MM-DD
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0];
+  };
+
   return (
     <ul style={{ listStyle: 'none', padding: 0 }}>
       {tasks.map((task) => (
@@ -23,15 +30,11 @@ export default function TaskList({ tasks }) {
 
           <span
             style={{
-              fontSize: '0.85rem',
-              padding: '4px 10px',
-              borderRadius: '4px',
-              fontWeight: 'bold',
-              backgroundColor: task.completed ? '#d1fae5' : '#fef3c7',
-              color: task.completed ? '#065f46' : '#92400e'
+              fontSize: '0.9rem',
+              color: '#666'
             }}
           >
-            {task.completed ? 'Completed' : 'Pending'}
+            {formatDate(task.dueDate || task.createdAt)}
           </span>
         </li>
       ))}
