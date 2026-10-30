@@ -11,12 +11,12 @@ export default function App() {
   const [error, setError] = useState('');
   const [token, setToken] = useState('');
   
-  // Login State
-  const [username, setUsername] = useState('');
+  // Clean, empty login state
+  const [emailOrUser, setEmailOrUser] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
 
-  // Step 3 & 4: Fetch tasks from API on mount
+  // Fetch tasks from API on mount
   const fetchTasks = async () => {
     setLoading(true);
     setError('');
@@ -38,7 +38,7 @@ export default function App() {
     fetchTasks();
   }, []);
 
-  // Step 5: Handle Login POST /api/auth/login
+  // Handle Login - sends both email and username keys for maximum backend compatibility
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoginError('');
@@ -46,28 +46,35 @@ export default function App() {
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ 
+          email: emailOrUser, 
+          username: emailOrUser, 
+          password 
+        })
       });
 
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+        throw new Error(data.message || data.error || 'Invalid credentials');
       }
 
       setToken(data.token);
-      setUsername('');
+      setEmailOrUser('');
       setPassword('');
     } catch (err) {
       setLoginError(err.message);
     }
   };
 
-  // Step 6: Handle Create Task POST /api/tasks with Authorization Bearer header
+  // Handle Create Task POST /api/tasks
   const handleAddTask = async (taskData) => {
     if (!token) {
       alert('You must be logged in to create a task!');
       return;
     }
+
+    // Format payload properly as an object, whether taskData is a string title or an object
+    const payload = typeof taskData === 'string' ? { title: taskData } : taskData;
 
     try {
       const response = await fetch(`${API_URL}/api/tasks`, {
@@ -76,15 +83,14 @@ export default function App() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(taskData)
+        body: JSON.stringify(payload)
       });
 
       if (!response.ok) {
         const errData = await response.json();
-        throw new Error(errData.message || 'Failed to add task');
+        throw new Error(errData.message || errData.error || 'Failed to add task');
       }
 
-      // Re-fetch tasks after successful creation
       await fetchTasks();
     } catch (err) {
       alert(`Error creating task: ${err.message}`);
@@ -99,14 +105,15 @@ export default function App() {
       {!token ? (
         <form onSubmit={handleLogin} style={{ marginBottom: '20px', border: '1px solid #ccc', padding: '15px', borderRadius: '5px' }}>
           <h3>Login</h3>
-          {loginError && <p style={{ color: 'red' }}>{loginError}</p>}
+          {loginError && <p style={{ color: 'red', fontWeight: 'bold' }}>{loginError}</p>}
           <div style={{ marginBottom: '10px' }}>
             <input
               type="text"
               placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={emailOrUser}
+              onChange={(e) => setEmailOrUser(e.target.value)}
               required
+              style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
             />
           </div>
           <div style={{ marginBottom: '10px' }}>
@@ -116,14 +123,15 @@ export default function App() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
             />
           </div>
-          <button type="submit">Login</button>
+          <button type="submit" style={{ padding: '8px 16px', cursor: 'pointer' }}>Login</button>
         </form>
       ) : (
-        <div style={{ marginBottom: '20px', color: 'green' }}>
-          <p><strong>Status:</strong> Logged In</p>
-          <button onClick={() => setToken('')}>Logout</button>
+        <div style={{ marginBottom: '20px', color: 'green', border: '1px solid green', padding: '10px', borderRadius: '5px' }}>
+          <p style={{ margin: 0 }}><strong>Status:</strong> Logged In Successfully</p>
+          <button onClick={() => setToken('')} style={{ marginTop: '10px', cursor: 'pointer' }}>Logout</button>
         </div>
       )}
 
